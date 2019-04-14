@@ -1,0 +1,18 @@
+Option Explicit
+
+Sub 開始時刻()
+    
+    Dim i
+    
+    i = Cells(Rows.Count, "A").End(xlUp).Row + 1
+    Range("A" & i).Select
+    ActiveCell.FormulaR1C1 = (i - 2) + 1
+    
+    
+    Dim n
+    
+    n = Cells(Rows.Count, "B").End(xlUp).Row + 1
+    Range("B" & n).Select
+    ActiveCell.FormulaR1C1 = Now
+
+End Sub

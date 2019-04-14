@@ -1,0 +1,564 @@
+Option Explicit
+
+Sub folder()
+
+    If Application.FileDialog(msoFileDialogFolderPicker).Show = True Then
+        Range("b2").Value = Application.FileDialog(msoFileDialogFolderPicker).SelectedItems(1)
+    End If
+
+End Sub
+
+Sub merge()
+
+
+'シート［LOG］を削除
+    On Error Resume Next
+    Application.DisplayAlerts = False
+       Worksheets("LOG").Delete
+    Application.DisplayAlerts = True
+    
+'シート［LOG］を一番右に追加
+    Worksheets.Add(after:=Worksheets(Worksheets.Count)).Name = "LOG"
+    
+'フォルダの場所を変数に入れる
+    Dim Folder_path
+    Folder_path = ThisWorkbook.Worksheets("folder").Range("b2").Value
+    
+  
+'結合するブックを変数に入れる
+    Dim FileType
+    If Worksheets("folder").Range("b1").Value = "Excel" Then
+        FileType = "\*.xls*"
+    End If
+
+    If Worksheets("folder").Range("b1").Value = "CSV" Then
+        FileType = "\*.csv*"
+    End If
+
+    If Worksheets("folder").Range("b1").Value = "LOG" Then
+        FileType = "\*.*LOG"
+    End If
+
+
+    Dim MergeWorkbook
+    MergeWorkbook = Dir(Folder_path & FileType)
+
+
+'指定したフォルダから、Excelファイルを探す
+    Do Until MergeWorkbook = ""
+        Workbooks.Open Filename:=Folder_path & "\" & MergeWorkbook
+        
+    
+        Dim MergeWorkbook_data  '結合するブック内のシートのデータ数
+        Dim ThisWorkbook_data  '結合先のシートのデータ数
+       
+        
+        Dim i
+        For i = 1 To Workbooks(MergeWorkbook).Worksheets.Count
+        
+            MergeWorkbook_data = Workbooks(MergeWorkbook).Worksheets(i).Range("a" & Rows.Count).End(xlUp).Row
+            ThisWorkbook_data = ThisWorkbook.Worksheets("LOG").Range("a" & Rows.Count).End(xlUp).Row
+            
+            Workbooks(MergeWorkbook).Worksheets(i).Rows("1:" & MergeWorkbook_data).Copy ThisWorkbook.Worksheets("LOG").Range("a" & ThisWorkbook_data + 1)
+        Next
+    
+           
+    '結合するブックを閉じる
+        Application.DisplayAlerts = False
+            Workbooks(MergeWorkbook).Close
+        Application.DisplayAlerts = True
+    
+'次のブックを探しに行く
+        MergeWorkbook = Dir()
+    Loop
+   
+
+End Sub
+
+Sub SHモデル変換()
+'
+' セルの塗りつぶし Macro
+'
+' Keyboard Shortcut: Ctrl+z
+'
+'----------------------------------------------------------------------------------------------------
+    Sheets("LOG").Select
+'----------------------------------------------------------------------------------------------------
+    Range("B2").Select
+    ActiveCell.FormulaR1C1 = "=MID(SUBSTITUTE(RC1,""(RED)"",""""),1,8)"
+    Range("C2").Select
+    ActiveCell.FormulaR1C1 = "=MID(SUBSTITUTE(RC1,""(RED)"",""""),10,100)"
+'----------------------------------------------------------------------------------------------------
+    Range("B2:C2").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Range("A2").End(xlDown).Offset(0, 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    ActiveSheet.Paste
+'----------------------------------------------------------------------------------------------------
+    Columns("C:C").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Columns("D:D").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+'----------------------------------------------------------------------------------------------------
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Application.CutCopyMode = False
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+'----------------------------------------------------------------------------------------------------
+    ' 枠線
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideVertical)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideHorizontal)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' *した*
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:="*した*", Operator:=xlFilterValues
+    
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 255
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:="--パワコンから読み出した内容確認--", Operator:=xlFilterValues
+    
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ColorIndex = xlAutomatic
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlNone
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+    ' *NG*
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:="*NG*", Operator:=xlFilterValues
+    
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 255
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:=Array("整定値初期化試験強制NGセット", "*00W測定NG"), Operator:=xlFilterValues
+    
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ColorIndex = xlAutomatic
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlNone
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    
+    ' "*せん*", "*できず*"
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:=Array("*せん*", "*できず*"), Operator:=xlFilterValues
+
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 255
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+    ' "*アウト*", "リモコン状態*"
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:=Array("*アウト*", "リモコン状態*"), Operator:=xlFilterValues
+
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 255
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' 異常終了
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:="異常終了"
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 5287936
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' ＊＊個別試験終了
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:= _
+        "＊＊個別試験終了"
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent4
+        .TintAndShade = 0.599993896298105
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' ＊＊終了＊＊
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:= _
+        Array("＊＊終了＊＊", "＊＊自動試験終了")
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 65535
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' "＊＊＊＊試験開始＊＊＊＊"
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:= _
+        "＊＊＊＊試験開始＊＊＊＊"
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ColorIndex = xlAutomatic
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent1
+        .TintAndShade = 0.599993896298105
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    Range("D1").Select
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3
+    Range("A:A,C:C").Select
+    Range("C1").Activate
+    Selection.EntireColumn.Hidden = True
+    Range("D2").Select
+    ActiveSheet.Columns(4).ColumnWidth = 60
+'----------------------------------------------------------------------------------------------------
+    With ActiveWindow
+        .SplitColumn = 0
+        .SplitRow = 1
+    End With
+'----------------------------------------------------------------------------------------------------
+    ActiveWindow.FreezePanes = True
+    Columns("A:D").Select
+    Selection.AutoFilter
+    Selection.AutoFilter
+    With Selection.Font
+        .Name = "ＭＳ Ｐゴシック"
+    End With
+'----------------------------------------------------------------------------------------------------
+    Sheets("LOG").Select
+    Sheets("LOG").Move
+    Dim fname As String
+    fname = Application.GetSaveAsFilename( _
+        FileFilter:="Excelブック,*.xlsx,全てのファイル,*.*", _
+        FilterIndex:=1, _
+        InitialFileName:="", _
+        Title:="検査LOGの保存")
+        
+    If fname <> "False" Then
+        ActiveWorkbook.SaveAs Filename:=fname
+    End If
+
+End Sub
+
+
+Sub EIBSモデル変換()
+'
+' セルの塗りつぶし Macro
+'
+' Keyboard Shortcut: Ctrl+z
+'
+'----------------------------------------------------------------------------------------------------
+    Sheets("LOG").Select
+'----------------------------------------------------------------------------------------------------
+    Range("B2").Select
+    ActiveCell.FormulaR1C1 = "=MID(RC1,1,8)"
+    Range("C2").Select
+    ActiveCell.FormulaR1C1 = "=MID(RC1,10,100)"
+'----------------------------------------------------------------------------------------------------
+    Range("B2:C2").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Range("A2").End(xlDown).Offset(0, 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    ActiveSheet.Paste
+'----------------------------------------------------------------------------------------------------
+    Columns("C:C").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Columns("D:D").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+'----------------------------------------------------------------------------------------------------
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Application.CutCopyMode = False
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+'----------------------------------------------------------------------------------------------------
+    ' 枠線
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideVertical)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideHorizontal)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' *(RED)
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:="*(RED)", Operator:=xlFilterValues
+    
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 255
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+    Criteria1:="*リトライ*", Operator:=xlFilterValues
+    
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ColorIndex = xlAutomatic
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlNone
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+    
+'    ' "*せん*", "*できず*"
+'    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, _
+'    Criteria1:=Array("*せん*", "*できず*"), Operator:=xlFilterValues
+'
+'    Range("B2:D2").Select
+'    Range(Selection, Selection.End(xlDown)).Select
+'    With Selection.Font
+'        .ThemeColor = xlThemeColorDark1
+'        .TintAndShade = 0
+'    End With
+'    With Selection.Interior
+'        .Pattern = xlSolid
+'        .PatternColorIndex = xlAutomatic
+'        .Color = 255
+'        .TintAndShade = 0
+'        .PatternTintAndShade = 0
+'    End With
+
+'----------------------------------------------------------------------------------------------------
+    ' 異常終了(RED)
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:="異常終了(RED)"
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 5287936
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' ＊＊個別試験終了
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:= _
+        "＊＊個別試験終了"
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent4
+        .TintAndShade = 0.599993896298105
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' エージング前*合格
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:= _
+        "エージング前*合格"
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 65535
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    ' "＊＊＊＊試験開始＊＊＊＊"
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3, Criteria1:= _
+        "＊＊＊＊試験開始＊＊＊＊"
+    Range("B2:D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    With Selection.Font
+        .ColorIndex = xlAutomatic
+        .TintAndShade = 0
+    End With
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent1
+        .TintAndShade = 0.599993896298105
+        .PatternTintAndShade = 0
+    End With
+'----------------------------------------------------------------------------------------------------
+    Range("D1").Select
+    ActiveSheet.Range("$B:$D").AutoFilter Field:=3
+    Range("A:A,C:C").Select
+    Range("C1").Activate
+    Selection.EntireColumn.Hidden = True
+    Range("D2").Select
+    ActiveSheet.Columns(4).ColumnWidth = 60
+'----------------------------------------------------------------------------------------------------
+    With ActiveWindow
+        .SplitColumn = 0
+        .SplitRow = 1
+    End With
+'----------------------------------------------------------------------------------------------------
+    ActiveWindow.FreezePanes = True
+    Columns("A:D").Select
+    Selection.AutoFilter
+    Selection.AutoFilter
+    With Selection.Font
+        .Name = "ＭＳ Ｐゴシック"
+    End With
+'----------------------------------------------------------------------------------------------------
+'    Sheets("LOG").Select
+'    Sheets("LOG").Move
+'    Dim fname As String
+'    fname = Application.GetSaveAsFilename( _
+'        FileFilter:="Excelブック,*.xlsx,全てのファイル,*.*", _
+'        FilterIndex:=1, _
+'        InitialFileName:="", _
+'        Title:="検査LOGの保存")
+'
+'    If fname <> "False" Then
+'        ActiveWorkbook.SaveAs Filename:=fname
+'    End If
+'
+End Sub

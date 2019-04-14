@@ -1,0 +1,34 @@
+Option Explicit
+
+Sub 全ファイル情報一覧()
+
+    ' 定義
+    Dim myFSO As New FileSystemObject
+    Dim myFolder As Folder
+    Dim myFiles As Files
+    Dim myFile As File
+    Dim LastRow As Long
+    Dim i As Integer
+    
+    ' ﾌｫﾙﾀﾞの指定
+    Set myFolder = myFSO.GetFolder("C:\Users\chy.murakami\Desktop\02 プロジェクト\04 出荷検査データ改善\☆報告書\190115-第一回確認会\成績書\TEST\DATA\社内用")
+    Set myFiles = myFolder.Files
+    
+    ' 最終ｾﾙの1つ下のｾﾙの行番号をiに代入
+    LastRow = Cells(Rows.Count, 1).End(xlUp).Row + 1
+    i = LastRow
+    
+    ' ﾌｧｲﾙ名/ﾌｧｲﾙ更新日時/現在日時を一覧にする
+    For Each myFile In myFiles
+        Cells(i, 1).Value = myFile.Name
+        Cells(i, 2).Value = myFile.DateLastModified
+        Cells(i, 3).Value = Now
+        
+        i = i + 1
+    Next
+    
+    ' ﾌｧｲﾙの保存先変更
+    'myFSO.MoveFile Source:="C:\Users\chy.murakami\Desktop\02 プロジェクト\04 出荷検査データ改善\☆報告書\190115-確認会\成績書\TEST\03 MD 検印済み ⇒ 情報取得ﾎﾞﾀﾝｸﾘｯｸで10へ自動で移動\*.pdf", _
+    '    Destination:="C:\Users\chy.murakami\Desktop\02 プロジェクト\04 出荷検査データ改善\☆報告書\190115-確認会\成績書\TEST\10 MD 管理表作成済み_QA 検印待ち ⇒ 検印後20へQAが手動で保存先選択\"
+    
+End Sub
