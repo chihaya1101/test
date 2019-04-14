@@ -1,0 +1,76 @@
+Private myReserveTime As Date
+
+'Sub 一定時間おきにマクロ実行()
+'
+'    myReserveTime = Now + TimeValue("24:00:00")
+'    Application.OnTime _
+'        EarliestTime:=myReserveTime, _
+'        Procedure:="一定時間おきにマクロ実行"
+'    ファイル移動
+'
+'End Sub
+
+'Sub 中止()
+'    Application.OnTime EarliestTime:=myReserveTime, _
+'        Procedure:="一定時間おきにマクロ実行", Schedule:=False
+'    MsgBox "一定時間のファイル移動を中止します。"
+'End Sub
+
+Sub ファイル移動()
+
+    Dim myFSO As New FileSystemObject
+'------------------------------------------------------------------------------------------
+    Dim file_Check_EIBS16HJ As String
+    file_Check_EIBS16HJ = Dir("\\10.200.1.18\meas\testfolder\成績書\EIBS16HJ_*.pdf")
+   
+    If file_Check_EIBS16HJ = "" Then
+        ' ﾌｧｲﾙがない場合何もしない
+    Else
+        ' ﾌｧｲﾙがある場合指定のﾌｫﾙﾀﾞにﾌｧｲﾙを移動
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJ_C_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJ\社内用\"
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJ_E_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJ\社外用\"
+    End If
+'------------------------------------------------------------------------------------------
+    Dim file_Check_EIBS16HJE As String
+    file_Check_EIBS16HJE = Dir("\\10.200.1.18\meas\testfolder\成績書\EIBS16HJE_*.pdf")
+   
+    If file_Check_EIBS16HJE = "" Then
+        ' ﾌｧｲﾙがない場合何もしない
+    Else
+        ' ﾌｧｲﾙがある場合指定のﾌｫﾙﾀﾞにﾌｧｲﾙを移動
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJE_C_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJE\社内用\"
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJE_E_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\EIBS16HJE\社外用\"
+    End If
+'------------------------------------------------------------------------------------------
+    Dim file_Check_JH42JT2 As String
+    file_Check_JH42JT2 = Dir("\\10.200.1.18\meas\testfolder\成績書\JH42JT2_*.pdf")
+   
+    If file_Check_JH42JT2 = "" Then
+        ' ﾌｧｲﾙがない場合何もしない
+    Else
+        ' ﾌｧｲﾙがある場合指定のﾌｫﾙﾀﾞにﾌｧｲﾙを移動
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\JH42JT2_C_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\JH42JT2\社内用\"
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\JH42JT2_E_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\JH42JT2\社外用\"
+    End If
+'------------------------------------------------------------------------------------------
+    Dim file_Check_JH55JT3 As String
+    file_Check_JH55JT3 = Dir("\\10.200.1.18\meas\testfolder\成績書\JH55JT3_*.pdf")
+   
+    If file_Check_JH55JT3 = "" Then
+        ' ﾌｧｲﾙがない場合何もしない
+    Else
+        ' ﾌｧｲﾙがある場合指定のﾌｫﾙﾀﾞにﾌｧｲﾙを移動
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\JH55JT3_C_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\JH55JT3\社内用\"
+        myFSO.MoveFile Source:="\\10.200.1.18\meas\testfolder\成績書\JH55JT3_E_*.pdf", _
+        Destination:="\\10.200.1.18\meas\testfolder\成績書\JH55JT3\社外用\"
+    End If
+'------------------------------------------------------------------------------------------
+
+End Sub
